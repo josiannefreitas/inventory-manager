@@ -1,4 +1,34 @@
-const { select } = require('@inquirer/prompts')
+const { select, input } = require('@inquirer/prompts')
+
+let products = []
+let currentId = 1
+
+const addProduct = async () => {
+  const name = await input({ message: 'Digite o nome do produto:' })
+  const category = await input({ message: 'Digite a categoria do produto:' })
+  const quantum = await input({
+    message: 'Informe a quantidade disponível em estoque:'
+  })
+  const price = await input({
+    message: 'Informe o valor unitário (Ex.: R$18,90 = 1890):'
+  })
+
+  if (!name || !category || !quantum || !price) {
+    console.log('Todos os campos são obrigatórios. Por favor, tente novamente.')
+    return
+  }
+
+  const product = {
+    id: currentId++,
+    name,
+    category,
+    quantum: Number(quantum),
+    price: (price / 100).toFixed(2)
+  }
+
+  products.push(product)
+  console.log('Produto adicionado com sucesso!')
+}
 
 const start = async () => {
   while (true) {
@@ -34,10 +64,10 @@ const start = async () => {
 
     switch (option) {
       case 'adicionar':
-        console.log('Adicionando produtos')
+        await addProduct()
         break
       case 'listar':
-        console.log('Listando produtos')
+        console.log('Listar produtos')
         break
       case 'atualizar':
         console.log('Atualizando produtos')
