@@ -19,6 +19,7 @@ const start = () => {
         console.log('Buscando produtos')
         break
       case 'sair':
+        console.log('Saindo')
         return
     }
   }
