@@ -30,6 +30,24 @@ const addProduct = async () => {
   console.log('Produto adicionado com sucesso!')
 }
 
+const listProducts = async () => {
+  if (products.length == 0) {
+    console.log('Nenhum produto cadastrado.')
+  } else {
+    console.log('Lista de produtos:')
+    products.forEach(product => {
+      console.log(
+        `ID: ${product.id}\n` +
+        `Nome: ${product.name}\n` +
+        `Categoria: ${product.category}\n` +
+        `Quantidade: ${product.quantum}\n` +
+        `Preço: R$${product.price}`
+      )
+      console.log('------------------')
+    })
+  }
+}
+
 const start = async () => {
   while (true) {
     const option = await select({
@@ -67,7 +85,7 @@ const start = async () => {
         await addProduct()
         break
       case 'listar':
-        console.log('Listar produtos')
+        await listProducts()
         break
       case 'atualizar':
         console.log('Atualizando produtos')
