@@ -1,0 +1,16 @@
+[
+  {
+    "id": 2,
+    "name": "bota",
+    "category": "segurança",
+    "quantum": 50,
+    "price": "135.00"
+  },
+  {
+    "id": 3,
+    "name": "calça",
+    "category": "segurança",
+    "quantum": 50,
+    "price": "60.00"
+  }
+]

@@ -4,6 +4,19 @@ const fs = require('fs').promises
 let products = []
 let currentId = 1
 
+const loadProduct = async () => {
+  try {
+    const data = await fs.readFile('products.json', 'utf-8')
+    products = JSON.parse(data)
+  } catch (error) {
+    products = []
+  }
+}
+
+const saveProducts = async () => {
+  await fs.writeFile('products.json', JSON.stringify(products, null, 2))
+}
+
 const addProduct = async () => {
   const name = await input({ message: 'Digite o nome do produto:' })
   const category = await input({ message: 'Digite a categoria do produto:' })
@@ -241,8 +254,10 @@ const searchProduct = async () => {
 }
 
 const start = async () => {
+  await loadProduct()
 
   while (true) {
+    await saveProducts()
 
     const option = await select({
       message: 'Menu >',
