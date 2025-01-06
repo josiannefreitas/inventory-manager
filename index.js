@@ -1,4 +1,5 @@
-const { select, input } = require('@inquirer/prompts')
+const { select, input, confirm } = require('@inquirer/prompts')
+const fs = require('fs').promises
 
 let products = []
 let currentId = 1
@@ -48,14 +49,8 @@ const listProducts = async () => {
   }
 }
 
-const updateProduct = async () => {
-  const identifyingProduct = await input({
-    message: 'Informe o ID do produto que deseja atualizar:'
-  })
-
-  const filteredProduct = await products.find(
-    product => product.id == identifyingProduct
-  )
+const findProductById = async id => {
+  const filteredProduct = await products.find(product => product.id == id)
 
   if (!filteredProduct) {
     console.log('Produto não encontrado. Verifique o ID e tente novamente.')
@@ -63,11 +58,22 @@ const updateProduct = async () => {
 
   console.log(
     `ID: ${filteredProduct.id}\n` +
-    `Nome: ${filteredProduct.name}\n` +
-    `Categoria: ${filteredProduct.category}\n` +
-    `Quantidade: ${filteredProduct.quantum}\n` +
-    `Preço: R$${filteredProduct.price}`
+      `Nome: ${filteredProduct.name}\n` +
+      `Categoria: ${filteredProduct.category}\n` +
+      `Quantidade: ${filteredProduct.quantum}\n` +
+      `Preço: R$${filteredProduct.price}`
   )
+
+  return filteredProduct
+}
+
+const updateProduct = async () => {
+  const productId = await input({
+    message: 'Informe o ID do produto que deseja atualizar:'
+  })
+
+  const productToUpdate = await findProductById(productId)
+  if (!productToUpdate) return
 
   while (true) {
     const fieldToUpdate = await select({
@@ -101,25 +107,25 @@ const updateProduct = async () => {
         const newName = await input({
           message: 'Digite o novo nome do produto:'
         })
-        filteredProduct.name = newName
+        productToUpdate.name = newName
         break
       case 'category':
         const newCategory = await input({
           message: 'Digite a nova categoria do produto:'
         })
-        filteredProduct.category = newCategory
+        productToUpdate.category = newCategory
         break
       case 'quantum':
         const newQuantum = await input({
           message: 'Informe a quantidade disponível atualmente em estoque:'
         })
-        filteredProduct.quantum = newQuantum
+        productToUpdate.quantum = newQuantum
         break
       case 'price':
         const newPrice = await input({
           message: 'Informe o valor unitário atualizado (Ex.: R$18,90 = 1890):'
         })
-        filteredProduct.price = (newPrice / 100).toFixed(2)
+        productToUpdate.price = (newPrice / 100).toFixed(2)
         break
       case 'sair':
         console.log('Produto atualizado com sucesso!')
@@ -128,8 +134,35 @@ const updateProduct = async () => {
   }
 }
 
+const deleteProduct = async () => {
+  if (products.length == 0) {
+    console.log('Não existem produtos cadastrados!')
+    return
+  }
+
+  const productId = await input({
+    message: 'Informe o ID do produto que deseja excluir:'
+  })
+
+  const productToDelete = await findProductById(productId)
+  if (!productToDelete) return
+
+  const deleteConfirmation = await confirm({
+    message: 'Deseja excluir este produto?'
+  })
+
+  if (deleteConfirmation) {
+    products = products.filter(product => product.id != productId)
+    console.log('Produto excluído com sucesso!')
+  } else {
+    console.log('Exclusão cancelada.')
+  }
+}
+
 const start = async () => {
+
   while (true) {
+
     const option = await select({
       message: 'Menu >',
       choices: [
@@ -171,10 +204,10 @@ const start = async () => {
         await updateProduct()
         break
       case 'excluir':
-        console.log('Excluindo produtos')
+        await deleteProduct()
         break
       case 'buscar':
-        console.log('Buscando produtos')
+        await searchProduct()
         break
       case 'sair':
         console.log('Saindo')
