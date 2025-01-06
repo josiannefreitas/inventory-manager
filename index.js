@@ -67,6 +67,30 @@ const findProductById = async id => {
   return filteredProduct
 }
 
+const findProductByName = async name => {
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(name.toLowerCase())
+  )
+
+  if (filteredProducts.length == 0) {
+    console.log('Nenhum produto encontrado com esse nome.')
+    return null
+  }
+
+  console.log('Produtos encontrados:')
+  filteredProducts.forEach(product => {
+    console.log(
+      `ID: ${product.id}\n` +
+        `Nome: ${product.name}\n` +
+        `Categoria: ${product.category}\n` +
+        `Quantidade: ${product.quantum}\n` +
+        `Preço: R$${product.price}`
+    )
+  })
+
+  return filteredProducts
+}
+
 const updateProduct = async () => {
   const productId = await input({
     message: 'Informe o ID do produto que deseja atualizar:'
@@ -156,6 +180,63 @@ const deleteProduct = async () => {
     console.log('Produto excluído com sucesso!')
   } else {
     console.log('Exclusão cancelada.')
+  }
+}
+
+const searchProduct = async () => {
+  if (products.length == 0) {
+    console.log('Não existem produtos cadastrados!')
+    return
+  }
+
+  const searchById = async () => {
+    const productId = await input({
+      message: 'Informe o ID do produto que deseja buscar:'
+    })
+
+    const productToSearch = await findProductById(productId)
+    if (!productToSearch) return
+  }
+
+  const searchByName = async () => {
+    const productName = await input({
+      message: 'Informe o Nome do produto que deseja buscar:'
+    })
+
+    const productToSearch = await findProductByName(productName)
+    if (!productToSearch) return
+  }
+
+  while (true) {
+    const searchMode = await select({
+      message: 'Escolha por qual campo deseja fazer a busca:',
+      choices: [
+        {
+          name: 'ID',
+          value: 'id'
+        },
+        {
+          name: 'Nome',
+          value: 'name'
+        },
+        {
+          name: 'Encerrar',
+          value: 'sair'
+        }
+      ]
+    })
+
+    switch (searchMode) {
+      case 'id':
+        await searchById()
+        break
+      case 'name':
+        await searchByName()
+        break
+      case 'sair':
+        console.log('Encerrando')
+        return
+    }
   }
 }
 
